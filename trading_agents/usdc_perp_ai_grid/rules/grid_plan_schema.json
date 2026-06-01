@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "USDC Perpetual AI Grid Plan",
+  "type": "object",
+  "required": [
+    "connector_name",
+    "trading_pair",
+    "grid_mode",
+    "start_price",
+    "end_price",
+    "total_amount_quote",
+    "min_spread_between_orders",
+    "max_open_orders",
+    "leverage",
+    "triple_barrier_config",
+    "decision_reason",
+    "invalidation_conditions"
+  ],
+  "properties": {
+    "connector_name": {"type": "string"},
+    "trading_pair": {"type": "string", "pattern": "^[A-Z0-9]+-USDC$"},
+    "grid_mode": {"type": "string", "enum": ["long_grid", "short_grid", "neutral_grid"]},
+    "start_price": {"type": "number", "exclusiveMinimum": 0},
+    "end_price": {"type": "number", "exclusiveMinimum": 0},
+    "limit_price": {"type": ["number", "null"], "exclusiveMinimum": 0},
+    "total_amount_quote": {"type": "number", "exclusiveMinimum": 0},
+    "min_spread_between_orders": {"type": "number", "exclusiveMinimum": 0},
+    "max_open_orders": {"type": "integer", "minimum": 2, "maximum": 50},
+    "leverage": {"type": "integer", "minimum": 1, "maximum": 20},
+    "triple_barrier_config": {
+      "type": "object",
+      "required": ["stop_loss", "take_profit", "time_limit"],
+      "properties": {
+        "stop_loss": {"type": "number", "exclusiveMinimum": 0},
+        "take_profit": {"type": "number", "exclusiveMinimum": 0},
+        "time_limit": {"type": "integer", "minimum": 60}
+      }
+    },
+    "decision_reason": {"type": "string", "minLength": 10},
+    "invalidation_conditions": {
+      "type": "array",
+      "items": {"type": "string"},
+      "minItems": 1
+    },
+    "source_candidate_file": {"type": ["string", "null"]},
+    "created_at": {"type": ["string", "null"]}
+  }
+}
+

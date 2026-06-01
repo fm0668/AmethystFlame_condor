@@ -45,6 +45,7 @@ from mcp_servers.hummingbot_api.tools.gateway_clmm import explore_gateway_clmm_p
 from mcp_servers.hummingbot_api.tools.gateway_swap import manage_gateway_swaps as manage_gateway_swaps_impl
 from mcp_servers.hummingbot_api.tools.geckoterminal import explore_geckoterminal as explore_geckoterminal_impl
 from mcp_servers.hummingbot_api.tools import history as history_tools
+from mcp_servers.hummingbot_api.tools.usdc_ai_grid import manage_usdc_ai_grid as manage_usdc_ai_grid_impl
 from mcp_servers.hummingbot_api.tools.backtesting import (
     manage_backtest_tasks as manage_backtest_tasks_impl,
     run_backtest as run_backtest_impl,
@@ -769,6 +770,46 @@ async def manage_executors(
     result = await manage_executors_impl(client, request)
 
     return result.get("formatted_output", str(result))
+
+
+@mcp.tool()
+@handle_errors("manage USDC AI grid")
+async def manage_usdc_ai_grid(
+        action: Literal["scan", "validate_plan", "preview", "deploy", "review"],
+        connector_name: str = "binance_perpetual",
+        trading_pairs: list[str] | None = None,
+        plan: dict[str, Any] | None = None,
+        candidate: dict[str, Any] | None = None,
+        account_name: str = "master_account",
+        controller_id: str = "usdc_ai_grid",
+        dry_run: bool = True,
+        max_pairs: int = 32,
+        min_24h_quote_volume: float = 0,
+) -> str:
+    """Manage the USDC perpetual AI grid workflow through Hummingbot API.
+
+    Actions:
+    - scan: Build the USDC perpetual universe and candidate features.
+    - validate_plan: Validate a JSON grid plan and return executor config if valid.
+    - preview: Validate and preview the executor config without deployment.
+    - deploy: Dry-run by default. Live deploy is intentionally blocked until enabled in the API service.
+    - review: Return the API review endpoint status.
+    """
+    client = await hummingbot_client.get_client()
+    result = await manage_usdc_ai_grid_impl(
+        client=client,
+        action=action,
+        connector_name=connector_name,
+        trading_pairs=trading_pairs,
+        plan=plan,
+        candidate=candidate,
+        account_name=account_name,
+        controller_id=controller_id,
+        dry_run=dry_run,
+        max_pairs=max_pairs,
+        min_24h_quote_volume=min_24h_quote_volume,
+    )
+    return str(result)
 
 
 @mcp.tool()
